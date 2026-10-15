@@ -1,12 +1,4 @@
 {
   "version": 1,
-  "skills": {
-    "design-pr-versionization": {
-      "source": "tellok/dotai",
-      "ref": "7f96019efc531774786892de1573b937e7274be9",
-      "sourceType": "github",
-      "skillPath": "skills/design-pr-versionization/SKILL.md",
-      "computedHash": "46426e8716e27c5d197d0997508dbb15f719ed6c46b8df55305be28d5b6fe84e"
-    }
-  }
+  "skills": {}
 }

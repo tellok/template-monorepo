@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test, onTestFinished } from 'vitest';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -6,29 +6,29 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { gitIdentity, routeName } from './dev-route.mjs';
 
-function repository(t) {
+function repository() {
   const cwd = mkdtempSync(join(tmpdir(), 'template-route-'));
-  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  onTestFinished(() => rmSync(cwd, { recursive: true, force: true }));
   const git = (...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: 'pipe' }).trim();
   git('init', '-b', 'feature/a');
   git('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture');
   return { cwd, git };
 }
 
-test('普通检出以完整分支名生成稳定域名', (t) => {
-  const { cwd } = repository(t);
+test('普通检出以完整分支名生成稳定域名', () => {
+  const { cwd } = repository();
   assert.equal(gitIdentity(cwd), 'branch-feature/a');
   assert.equal(routeName(gitIdentity(cwd)), routeName('branch-feature/a'));
 });
-test('关联工作树使用工作树根目录名', (t) => {
-  const { cwd, git } = repository(t);
+test('关联工作树使用工作树根目录名', () => {
+  const { cwd, git } = repository();
   const linked = join(cwd, 'linked-checkout');
   git('worktree', 'add', '-b', 'other-branch', linked);
   assert.equal(gitIdentity(linked), 'worktree-linked-checkout');
   assert.notEqual(routeName(gitIdentity(linked)), routeName(gitIdentity(cwd)));
 });
-test('分离头指针使用目录与短提交', (t) => {
-  const { cwd, git } = repository(t);
+test('分离头指针使用目录与短提交', () => {
+  const { cwd, git } = repository();
   git('checkout', '--detach');
   assert.match(gitIdentity(cwd), /^detached-template-route-.+-[a-f0-9]{12}$/);
 });

@@ -1,11 +1,4 @@
 {
   "version": 3,
-  "skills": {},
-  "remote": {
-    "design-pr-versionization": {
-      "package": ".",
-      "source": "tellok/dotai",
-      "ref": "7f96019efc531774786892de1573b937e7274be9"
-    }
-  }
+  "skills": {}
 }

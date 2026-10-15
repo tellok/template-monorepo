@@ -10,7 +10,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-依赖安装会运行 `skills-npm`，自动发现工作区依赖附带的技能，并按固定上游提交安装发布设计技能。pnpm 负责 npm 依赖，skills-npm 负责代理技能。无需全局安装项目开发工具。
+依赖安装会运行 `skills-npm`，自动发现工作区依赖附带的技能。发布设计技能仅在初始化设计时使用，不安装进项目或通过 prepare 拉取。pnpm 负责 npm 依赖，skills-npm 负责代理技能。无需全局安装项目开发工具。
 
 云环境若用户目录只读，先设置可写的工具状态路径：
 
@@ -27,7 +27,7 @@ export npm_config_cache=/workspace/.npm-cache
 app/webapp/          Vue + TypeScript + Vite，@template/webapp
 packages/tsconfig/   共享严格配置，@template/tsconfig
 scripts/            本地域名、测试及 CI 身份检查
-.agents/skills/      OpenSpec 和发布维护技能
+.agents/skills/      OpenSpec 维护技能
 openspec/           规格与变更记录
 ```
 
@@ -59,6 +59,10 @@ pnpm exec playwright install --with-deps chromium
 ```
 
 可用 `BROWSER_PATH` 指定已安装 Chromium。测试使用隔离临时目录及随机空闲端口，结束时停止自己创建的服务，不上传报告或 trace。
+
+## Vitest
+
+`pnpm test` 使用固定版本的 Vitest 非交互执行测试；`pnpm test:watch` 进入开发监听模式。根 `vitest.config.ts` 发现 scripts、app、packages 下的测试，默认使用 Node 环境，服务集成测试使用 Playwright 驱动真实浏览器。文件串行运行，初始化及清理有独立超时，空测试不会报告成功；GitHub/GitLab 的 `pnpm check` 自动使用同一入口。运行服务测试前先 `pnpm build`。
 
 ## 稳定的本地域名
 

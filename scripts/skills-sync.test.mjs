@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test, onTestFinished } from 'vitest';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -7,9 +7,9 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-test('依赖内技能同步且再次同步保持稳定', (t) => {
+test('依赖内技能同步且再次同步保持稳定', () => {
   const cwd = mkdtempSync(resolve(tmpdir(), 'template-skills-'));
-  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  onTestFinished(() => rmSync(cwd, { recursive: true, force: true }));
   const dependency = resolve(cwd, 'node_modules/fixture-tool');
   mkdirSync(resolve(dependency, 'skills/fixture-skill'), { recursive: true });
   writeFileSync(

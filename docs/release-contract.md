@@ -52,4 +52,4 @@ flowchart TD
 
 同包/版本正式写入串行；同版本远端字节冲突失败，未知写入先回读，只补缺项。Latest 只有启用后才按 SemVer 向前推进，旧运行不得回退新版本。缓存损坏时重建。没有持久同源归档时重跑完整原生产链，不承诺只重跑下游；正式发布成功但后续步骤失败时修复同版本，不另造新版本。
 
-依据：[design-pr-versionization](../.agents/skills/design-pr-versionization/SKILL.md)，上游固定为 `tellok/dotai@7f96019efc531774786892de1573b937e7274be9`。平台方案分别见 [GitHub](release-github.md)、[GitLab](release-gitlab.md)。
+依据：[初始化时参考的 design-pr-versionization](https://github.com/tellok/dotai/blob/7f96019efc531774786892de1573b937e7274be9/skills/design-pr-versionization/SKILL.md)，上游固定为 `tellok/dotai@7f96019efc531774786892de1573b937e7274be9`。平台方案分别见 [GitHub](release-github.md)、[GitLab](release-gitlab.md)。

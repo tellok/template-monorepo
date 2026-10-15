@@ -10,7 +10,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
-    "test": "node --test --test-concurrency=1 scripts/*.test.mjs",
+    "test": "vitest run",
     "check": "pnpm format:check && pnpm typecheck && pnpm build && pnpm test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -19,17 +19,9 @@
     "spec:list": "openspec list --json",
     "spec:validate": "openspec validate --all --strict",
     "changeset": "changeset",
-    "version:packages": "changeset version && pnpm install --lockfile-only --ignore-scripts"
+    "version:packages": "changeset version && pnpm install --lockfile-only --ignore-scripts",
+    "test:watch": "vitest"
   },
-  "skills": [
-    {
-      "source": "tellok/dotai",
-      "skills": [
-        "design-pr-versionization"
-      ],
-      "ref": "7f96019efc531774786892de1573b937e7274be9"
-    }
-  ],
   "devDependencies": {
     "@changesets/cli": "3.0.3",
     "@fission-ai/openspec": "1.14.2",
@@ -39,6 +31,8 @@
     "prettier": "3.9.10",
     "skills-npm": "4.1.0",
     "turbo": "2.11.8",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.4"
   }
 }

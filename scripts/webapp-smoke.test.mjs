@@ -1,4 +1,4 @@
-import { test, before, after } from 'node:test';
+import { test, beforeAll, afterAll } from 'vitest';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { request } from 'node:http';
@@ -65,28 +65,25 @@ async function ready(port, host) {
   }
   throw new Error(`Startup failed:\n${logs}`);
 }
-before(
-  async () => {
-    port = await freePort();
-    previewPort = await freePort();
-    env = {
-      ...process.env,
-      PORTLESS_PORT: String(port),
-      PORTLESS_HTTPS: '0',
-      PORTLESS_SYNC_HOSTS: '0',
-      PORTLESS_LAN: '0',
-      PORTLESS_STATE_DIR: state,
-    };
-    dev = launch([resolve(root, 'scripts/dev.mjs')], root);
-    preview = launch(
-      [resolve(root, 'app/webapp/node_modules/vite/bin/vite.js'), 'preview', '--port', String(previewPort)],
-      resolve(root, 'app/webapp'),
-    );
-    await Promise.all([ready(port, hostname), ready(previewPort, 'localhost')]);
-  },
-  { timeout: 60000 },
-);
-after(async () => {
+beforeAll(async () => {
+  port = await freePort();
+  previewPort = await freePort();
+  env = {
+    ...process.env,
+    PORTLESS_PORT: String(port),
+    PORTLESS_HTTPS: '0',
+    PORTLESS_SYNC_HOSTS: '0',
+    PORTLESS_LAN: '0',
+    PORTLESS_STATE_DIR: state,
+  };
+  dev = launch([resolve(root, 'scripts/dev.mjs')], root);
+  preview = launch(
+    [resolve(root, 'app/webapp/node_modules/vite/bin/vite.js'), 'preview', '--port', String(previewPort)],
+    resolve(root, 'app/webapp'),
+  );
+  await Promise.all([ready(port, hostname), ready(previewPort, 'localhost')]);
+}, 60000);
+afterAll(async () => {
   for (const child of [dev, preview]) {
     if (!child?.pid) continue;
     try {
@@ -110,7 +107,7 @@ after(async () => {
     child.on('error', r);
   });
   rmSync(state, { recursive: true, force: true });
-});
+}, 20000);
 test('HTTP 代理返回首页与已转换入口模块', async () => {
   assert.match((await get(port, '/', hostname)).body, /Template Webapp/);
   const entry = await get(port, '/src/main.ts', hostname);

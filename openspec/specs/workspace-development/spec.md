@@ -34,6 +34,24 @@
 - **WHEN** 开发者安装依赖且生命周期脚本正常运行
 - **THEN** `skills-npm` 按工作区扫描依赖并生成其管理清单，内部维护技能进入 `.agents/skills/`
 
+### Requirement: 统一测试入口
+
+项目 SHALL 使用固定版本的 Vitest 作为统一测试运行器，提供非交互执行与开发监听命令；空测试 MUST 失败，真实服务测试的启动和清理 SHALL 使用独立超时。
+
+#### Scenario: 本地与流水线执行测试
+
+- **WHEN** 开发者或 CI 运行 `pnpm test`
+- **THEN** Vitest 执行工作区测试并按实际结果返回退出码，保留既有服务、浏览器、版本及技能验证覆盖
+
+### Requirement: 一次性设计技能不作为项目依赖
+
+项目 MUST 不安装或自动拉取仅用于初始化发布设计的 design-pr-versionization 技能；依赖技能自动同步能力 SHALL 保留。发布设计依据可通过上游链接追溯。
+
+#### Scenario: 重新安装依赖
+
+- **WHEN** 使用者执行冻结安装并触发技能同步
+- **THEN** 不创建 design-pr-versionization 目录，不向技能锁记录添加该技能，OpenSpec 维护技能保持可用
+
 ### Requirement: 忽略文件来源可追溯
 
 项目 SHALL 使用用户指定 Toptal 地址的完整成功响应作为 `.gitignore` 基础，并明确标注额外项目规则；下载失败 MUST 报告而非静默替换来源。

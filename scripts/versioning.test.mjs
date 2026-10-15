@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test, onTestFinished } from 'vitest';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -7,9 +7,9 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-test('单包变更不无条件提升其他包版本', (t) => {
+test('单包变更不无条件提升其他包版本', () => {
   const cwd = mkdtempSync(resolve(tmpdir(), 'template-version-'));
-  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+  onTestFinished(() => rmSync(cwd, { recursive: true, force: true }));
   for (const p of ['app/webapp', 'packages/tsconfig', '.changeset']) mkdirSync(resolve(cwd, p), { recursive: true });
   for (const p of ['app/webapp/package.json', 'packages/tsconfig/package.json', '.changeset/config.json'])
     writeFileSync(resolve(cwd, p), readFileSync(resolve(root, p)));
