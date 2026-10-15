@@ -2,6 +2,8 @@
 
 共享规则见 [独立版本发布契约](release-contract.md)。当前 `.github/workflows/ci.yml` 提供 PR 与仓库实际默认分支 push 质量入口、只读权限、完整 SHA 固定的官方 Actions、按请求取消旧运行，以及前后两次合并身份检查。尚未在 GitHub 执行；真实执行结果以推送后的检查为准。
 
+当前仓库使用 Tower 临时 self-hosted runner，保留远端已有的按 run ID/attempt 分配标签配置。该基础设施不会随模板复制自动开通；新项目应替换 runs-on 或接入自己的 Tower，见[模板复用清单](template-usage.md)。
+
 ## 原生检查与启用设置
 
 PR 使用原生测试合并检出，检验实际 head/base 父提交并回读最新 PR 身份；修改过期即失败。工作流没有目标分支过滤，覆盖非默认目标。安装与根检查脚本来自该检出。配置解析来源需要在目标仓库实测，涉及 CI 修改时单独审计实际解析版本。

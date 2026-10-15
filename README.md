@@ -105,7 +105,7 @@ pnpm exec openspec validate <change-name> --strict
 
 Changesets 使用独立版本，无 fixed/linked 组。初始包均私有，应用也生成版本和 CHANGELOG，但不上传 npm。正式版本命令只能在预期变更已合并且工作区干净时运行；测试在隔离副本消费，不改工作目录。
 
-GitHub Actions 与 GitLab CI 使用分开的原生配置，执行相同的质量命令。GitLab MR 检查要求实例启用 merged results pipelines，否则明确失败。GitHub 需要启用 Actions 的外部贡献者原生执行审批。两平台的远端实际运行尚未验证。
+GitHub Actions 与 GitLab CI 使用分开的原生配置，执行相同的质量命令。当前 GitHub 执行器使用原仓库的 Tower 临时 runner，新项目应按[复用清单](docs/template-usage.md)改为自己的 runner 或 `ubuntu-latest`。GitLab MR 检查要求实例启用 merged results pipelines，否则明确失败。GitHub 需要启用 Actions 的外部贡献者原生执行审批。两平台的远端实际运行尚未验证。
 
 自动版本 PR/MR、目标分支 push 对全部开放请求的重检调度、正式上传与部署尚未启用。设计、组件可用状态、权限与启用条件见 [共享发布契约](docs/release-contract.md)、[GitHub 方案](docs/release-github.md)、[GitLab 方案](docs/release-gitlab.md)。
 

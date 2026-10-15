@@ -28,6 +28,12 @@ Changesets 的 `.changeset/config.json` 中 `baseBranch` 需要显式设为新�
 
 全部包初始为 private。需要公开 npm 发布时，先决定包名所有权、许可证、注册表与访问级别，再调整 private、publishConfig、分发文件及 Changesets 策略；不要因为来自模板就直接上传占位包。模板没有配置发布凭据、自动版本 PR/MR 或部署目标，详见两平台发布设计文档。
 
+## 持续集成执行器
+
+当前模板仓库的 GitHub 任务使用 Tower 临时 self-hosted runner，标签包括 tower 和按 run ID/attempt 生成的 tower-run 标签；这是原仓库的环境集成，不是新项目已具备的基础设施。复用后必须检查 `.github/workflows/ci.yml` 的 runs-on：没有自己的 Tower 调度器时改为 `runs-on: ubuntu-latest`；有自己的 runner 时配置所属项目的标签、权限及执行审批。不要仅复制标签就假设有 runner 会接单，也不要沿用原项目凭据。
+
+GitLab 的 Node 镜像基线可直接复用，但 Runner、套餐能力、受保护变量与 merged results 开关均需要在新项目核实。模板不会自动把新项目注册到当前仓库的 CI 基础设施。
+
 ## 本地域名
 
 默认域名由分支/工作树身份、项目名称与 Git 公共目录标识组成，因此不同目录下的模板副本即使仍保留同名占位包和分支也能隔离。关联工作树共享同一项目命名空间，具体路由仍以工作树目录名区分。目录搬移会改变项目标识，这属于本机检出身份变化。
