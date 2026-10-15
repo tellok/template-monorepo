@@ -8,11 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { createServer } from 'node:net';
 import { chromium } from 'playwright';
-import { gitIdentity, routeName } from './dev-route.mjs';
+import { gitIdentity, projectIdentity, routeName } from './dev-route.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const state = mkdtempSync(resolve(tmpdir(), 'template-proxy-'));
-const hostname = `${routeName(gitIdentity(root))}.localhost`;
+const hostname = `${routeName(gitIdentity(root), projectIdentity(root))}.localhost`;
 let port, previewPort, dev, preview, env;
 let logs = '';
 const portless = resolve(root, 'node_modules/portless/dist/cli.js');

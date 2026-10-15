@@ -15,13 +15,20 @@ test('单包变更不无条件提升其他包版本', () => {
     writeFileSync(resolve(cwd, p), readFileSync(resolve(root, p)));
   writeFileSync(resolve(cwd, 'package.json'), JSON.stringify({ private: true, workspaces: ['app/*', 'packages/*'] }));
   writeFileSync(resolve(cwd, 'pnpm-workspace.yaml'), 'packages:\n  - app/*\n  - packages/*\n');
-  writeFileSync(resolve(cwd, '.changeset/webapp.md'), '---\n"@template/webapp": patch\n---\n\n修复应用示例。\n');
+  const originalWebapp = JSON.parse(readFileSync(resolve(cwd, 'app/webapp/package.json'), 'utf8'));
+  const originalShared = JSON.parse(readFileSync(resolve(cwd, 'packages/tsconfig/package.json'), 'utf8'));
+  const [major, minor, patch] = originalWebapp.version.split('.').map(Number);
+  const nextVersion = `${major}.${minor}.${patch + 1}`;
+  writeFileSync(
+    resolve(cwd, '.changeset/webapp.md'),
+    `---\n${JSON.stringify(originalWebapp.name)}: patch\n---\n\n修复应用示例。\n`,
+  );
   execFileSync(process.execPath, [resolve(root, 'node_modules/@changesets/cli/bin.js'), 'version'], {
     cwd,
     stdio: 'pipe',
   });
   const pkg = (p) => JSON.parse(readFileSync(resolve(cwd, p, 'package.json'), 'utf8'));
-  assert.equal(pkg('app/webapp').version, '0.1.1');
-  assert.equal(pkg('packages/tsconfig').version, '0.1.0');
-  assert.match(readFileSync(resolve(cwd, 'app/webapp/CHANGELOG.md'), 'utf8'), /0\.1\.1/);
+  assert.equal(pkg('app/webapp').version, nextVersion);
+  assert.equal(pkg('packages/tsconfig').version, originalShared.version);
+  assert.ok(readFileSync(resolve(cwd, 'app/webapp/CHANGELOG.md'), 'utf8').includes(`## ${nextVersion}`));
 });

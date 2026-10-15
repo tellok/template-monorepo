@@ -22,7 +22,9 @@ check:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   script:
-    - npm install --global pnpm@11.25.0
+    - |
+      pnpm_package=$(node -p "require('./package.json').packageManager.split('+')[0]")
+      npm install --global "$pnpm_package"
     - node scripts/verify-ci-context.mjs
     - pnpm install --frozen-lockfile
     - pnpm exec playwright install --with-deps chromium

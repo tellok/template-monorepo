@@ -12,14 +12,23 @@ pnpm dev
 
 依赖安装会运行 `skills-npm`，自动发现工作区依赖附带的技能。发布设计技能仅在初始化设计时使用，不安装进项目或通过 prepare 拉取。pnpm 负责 npm 依赖，skills-npm 负责代理技能。无需全局安装项目开发工具。
 
-云环境若用户目录只读，先设置可写的工具状态路径：
+云环境若用户目录只读，可由环境配置指定可写的工具状态路径（本机通常无需设置）：
 
 ```bash
-export XDG_DATA_HOME=/workspace/.xdg-data
-export npm_config_cache=/workspace/.npm-cache
+export XDG_DATA_HOME="${TMPDIR:-/tmp}/project-tool-data"
+export npm_config_cache="${TMPDIR:-/tmp}/project-npm-cache"
+export PORTLESS_STATE_DIR="${TMPDIR:-/tmp}/project-portless"
 ```
 
 在此仓库现有检出中开发即可；云任务本身已隔离，不自动创建额外 worktree。
+
+## 用作新项目模板
+
+通过 GitHub 的 **Use this template** 创建新仓库，或复制后在新目录初始化 Git；不要沿用模板仓库的 origin。模板本身没有绑定正式发布凭据或生产部署目标。
+
+新项目的必要调整见 [模板复用清单](docs/template-usage.md)，包括根名称、npm scope、包引用、Changesets 基准分支和可见性。示例包名 `@template/*` 是占位名称；模板不会在 install/prepare 时擅自重命名文件、改写 Git 历史或删除规格。
+
+验证安装脚本按自身位置定位仓库，不依赖目录名或 `/workspace`。从任意工作目录运行 `bash <新项目路径>/scripts/cloud-setup.sh` 可执行完整检查。
 
 ## 目录
 
@@ -66,11 +75,13 @@ pnpm exec playwright install --with-deps chromium
 
 ## 稳定的本地域名
 
-`pnpm dev` 输出实际 URL。名称规则：普通检出用完整分支名，关联工作树用工作树目录名，分离 HEAD 用目录名与短提交；清洗后附加确定性散列，处理斜杠、中文和过长名称。服务冲突明确失败，不覆盖其他注册。域名形态为 `<身份标签>.webapp.localhost`；应用的随机端口由 portless 管理。
+`pnpm dev` 输出实际 URL。名称规则：普通检出用完整分支名，关联工作树用工作树目录名，分离 HEAD 用目录名与短提交；清洗后附加确定性散列，处理斜杠、中文和过长名称。服务冲突明确失败，不覆盖其他注册。域名形态为 `<身份标签>.<项目标签>.webapp.localhost`，项目标签结合根清单名称与 Git 公共目录身份生成，使不同副本即使仍使用同一个占位包名也不会共享路由；应用的随机端口由 portless 管理。
 
-默认采用环回 HTTP 代理、端口 1355、`PORTLESS_SYNC_HOSTS=0` 和Git 公共元数据下的 `portless/` 状态目录（关联工作树共享），适合无提权云开发。若浏览器无法解析 `.localhost`，按 portless 官方文档配置本机解析；云验证使用真实 Host 请求，不依赖系统 DNS。
+默认采用环回 HTTP 代理、端口 1355 和 `PORTLESS_SYNC_HOSTS=0`；状态使用 portless 的用户级默认目录，多个项目与工作树共享代理。无权限写用户目录的云环境通过 `PORTLESS_STATE_DIR` 指定可写状态目录，同一用户下需要共享代理的项目使用相同目录。测试始终使用独立临时状态及随机代理端口。
 
-开发者可自行启用 `PORTLESS_HTTPS=1` 并按 `pnpm exec portless trust --help` 完成本机证书信任，HTTPS 使用当前代理端口；可用 `PORTLESS_PORT` 调整端口。改变运行中的代理设置前先在相同环境变量和状态目录下执行 `pnpm exec portless proxy stop`。默认状态路径可通过 `git rev-parse --path-format=absolute --git-common-dir` 查询，再追加 `/portless`；直接调用 portless CLI 时需用 `PORTLESS_STATE_DIR` 指向相同目录。不要停止他人使用的代理。`PORTLESS_STATE_DIR` 可指定独立状态；切换服务进程或新云任务时需要重启，不能只依赖缓存目录。
+项目标签包含当前机器上 Git 公共目录的散列，因此搬移检出目录后域名可能变化；同一位置重复启动以及关联工作树间的项目命名空间保持稳定。若浏览器无法解析 `.localhost`，按 portless 官方文档配置本机解析；云验证使用真实 Host 请求。
+
+开发者可自行启用 `PORTLESS_HTTPS=1` 并按 `pnpm exec portless trust --help` 完成本机证书信任；可用 `PORTLESS_PORT` 调整端口。改变代理设置前，在相同 `PORTLESS_STATE_DIR` 下执行 `pnpm exec portless proxy stop`；默认未指定时直接使用 portless 用户状态。共享代理停止会影响其他项目，先确认使用者。新任务需要重启应用进程，不依赖状态目录推断服务已启动。
 
 ## Prettier 与 VS Code
 
@@ -80,7 +91,7 @@ pnpm exec playwright install --with-deps chromium
 
 ## OpenSpec 与代理规则
 
-根 [AGENTS.md](AGENTS.md) 原样来自指定上游，OpenSpec 已初始化，并将 CLI 固定为开发依赖。维护技能位于 `.agents/skills/`。正常后续流程是 Proposal → 用户审批 → Apply → 验证 → Archive；本次初始化按用户明确指示跳过门禁和提案等待，已有规划作为设计记录保留，不更改上游协作规则。
+根 [AGENTS.md](AGENTS.md) 原样来自指定上游，OpenSpec 已初始化，并将 CLI 固定为开发依赖。维护技能位于 `.agents/skills/`。正常后续流程是 Proposal → 用户审批 → Apply → 验证 → Archive。一次性的初始化执行记录不作为新项目的默认授权。
 
 ```bash
 pnpm exec openspec new change <change-name>

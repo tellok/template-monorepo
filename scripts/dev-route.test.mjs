@@ -1,16 +1,18 @@
 import { test, onTestFinished } from 'vitest';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { gitIdentity, routeName } from './dev-route.mjs';
+import { gitIdentity, projectIdentity, routeName } from './dev-route.mjs';
 
 function repository() {
   const cwd = mkdtempSync(join(tmpdir(), 'template-route-'));
   onTestFinished(() => rmSync(cwd, { recursive: true, force: true }));
   const git = (...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: 'pipe' }).trim();
   git('init', '-b', 'feature/a');
+  writeFileSync(join(cwd, 'package.json'), JSON.stringify({ name: 'fixture-project' }));
+  git('add', 'package.json');
   git('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture');
   return { cwd, git };
 }
@@ -44,4 +46,21 @@ test('过长名称符合 DNS 长度限制', () => {
 test('非 ASCII 名称生成非空合法标签', () => {
   assert.match(routeName('中文/!'), /^workspace-[a-f0-9]{10}\.webapp$/);
   assert.notEqual(routeName('中文/!'), routeName('中文/?'));
+});
+
+test('不同模板副本在同名分支和包名下使用不同域名', () => {
+  const first = repository();
+  const second = repository();
+  assert.equal(gitIdentity(first.cwd), gitIdentity(second.cwd));
+  assert.notEqual(
+    routeName(gitIdentity(first.cwd), projectIdentity(first.cwd)),
+    routeName(gitIdentity(second.cwd), projectIdentity(second.cwd)),
+  );
+});
+
+test('同一项目的关联工作树共享项目命名空间', () => {
+  const { cwd, git } = repository();
+  const linked = join(cwd, 'linked-checkout');
+  git('worktree', 'add', '-b', 'linked-branch', linked);
+  assert.deepEqual(projectIdentity(cwd), projectIdentity(linked));
 });

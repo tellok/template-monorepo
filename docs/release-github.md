@@ -1,6 +1,6 @@
 # GitHub Actions 方案
 
-共享规则见 [独立版本发布契约](release-contract.md)。当前 `.github/workflows/ci.yml` 提供 PR 与 main push 质量入口、只读权限、完整 SHA 固定的官方 Actions、按请求取消旧运行，以及前后两次合并身份检查。尚未在 GitHub 执行；真实执行结果以推送后的检查为准。
+共享规则见 [独立版本发布契约](release-contract.md)。当前 `.github/workflows/ci.yml` 提供 PR 与仓库实际默认分支 push 质量入口、只读权限、完整 SHA 固定的官方 Actions、按请求取消旧运行，以及前后两次合并身份检查。尚未在 GitHub 执行；真实执行结果以推送后的检查为准。
 
 ## 原生检查与启用设置
 
