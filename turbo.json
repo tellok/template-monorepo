@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "PORTLESS_PORT",
+        "PORTLESS_HTTPS",
+        "PORTLESS_STATE_DIR",
+        "PORTLESS_SYNC_HOSTS",
+        "PORTLESS_TLD",
+        "PORTLESS_LAN"
+      ]
+    }
+  }
+}

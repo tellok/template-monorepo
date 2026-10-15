@@ -1,0 +1,45 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #182923;
+  background: #f5f6f0;
+  font-synthesis: none;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+main {
+  padding: 3rem 2rem;
+  max-width: 42rem;
+}
+h1 {
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+.eyebrow {
+  color: #4b6c5d;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+}
+button {
+  border: 0;
+  border-radius: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  background: #244b3b;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 3px solid #b3c770;
+  outline-offset: 4px;
+}
+.hint {
+  margin-top: 2rem;
+  color: #5a6a61;
+  font-size: 0.85rem;
+}

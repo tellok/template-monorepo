@@ -1,0 +1,31 @@
+image: node:24.19.0-bookworm
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - when: never
+
+stages: [check]
+
+variables:
+  CI: 'true'
+  GIT_DEPTH: '2'
+  TURBO_TELEMETRY_DISABLED: '1'
+  OPENSPEC_TELEMETRY: '0'
+
+check:
+  stage: check
+  interruptible: true
+  timeout: 20 minutes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - npm install --global pnpm@11.25.0
+    - node scripts/verify-ci-context.mjs
+    - pnpm install --frozen-lockfile
+    - pnpm exec playwright install --with-deps chromium
+    - pnpm check
+    - pnpm spec:validate
+    - node scripts/verify-ci-context.mjs

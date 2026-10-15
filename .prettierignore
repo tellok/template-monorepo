@@ -1,0 +1,10 @@
+node_modules/
+**/dist/
+**/.turbo/
+.portless/
+.pnpm-store/
+.agents/skills/
+pnpm-lock.yaml
+skills-lock.json
+skills-npm-lock.json
+AGENTS.md
