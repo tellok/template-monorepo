@@ -15,32 +15,36 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on:
+    - self-hosted
+    - tower
+    - ubuntu-latest
+    - tower-run-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 20
     env:
       CI: 'true'
       TURBO_TELEMETRY_DISABLED: '1'
       OPENSPEC_TELEMETRY: '0'
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          fetch-depth: 2
-          persist-credentials: false
-      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
-        with:
-          run_install: false
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version-file: .node-version
-      - name: Verify merge identity before execution
-        run: node scripts/verify-ci-context.mjs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm check
-      - run: pnpm spec:validate
-      - name: Verify merge identity before reporting
-        run: node scripts/verify-ci-context.mjs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+    - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09   # v5
+      with:
+        fetch-depth: 2
+        persist-credentials: false
+    - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa   # v4
+      with:
+        run_install: false
+    - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444   # v5
+      with:
+        node-version-file: .node-version
+    - name: Verify merge identity before execution
+      run: node scripts/verify-ci-context.mjs
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm exec playwright install --with-deps chromium
+    - run: pnpm check
+    - run: pnpm spec:validate
+    - name: Verify merge identity before reporting
+      run: node scripts/verify-ci-context.mjs
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
